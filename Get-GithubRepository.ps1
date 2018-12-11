@@ -5,7 +5,7 @@
    This function will download files from Github without using Git.  You will need to know the Owner, Repository name, branch (default master),
    and FilePath.  The Filepath will include any folders and files that you want to download.
 .EXAMPLE
-   Get-GithubRepository -Owner MSAdministrator -Repository WriteLogEntry -Verbose -FilePath `
+   Get-GithubRepository -Owner MSAdministrator -Repository WriteLogEntry -Target "C:\\downloadPath" -Verbose -FilePath `
         'WriteLogEntry.psm1',
         'WriteLogEntry.psd1',
         'Public',
@@ -38,16 +38,27 @@ function Get-GithubRepository
                    Position=2)]
         [string]$Branch = 'master',
 
-        # Please provide a list of files/paths to download
+         # Please provide the targeted path where to download
         [Parameter(Mandatory=$true,
                    ValueFromPipelineByPropertyName=$true,
                    Position=3)]
+        [string[]]$Target,
+
+        # Please provide a list of files/paths to download
+        [Parameter(Mandatory=$true,
+                   ValueFromPipelineByPropertyName=$true,
+                   Position=4)]
         [string[]]$FilePath
     )
 
     Begin
     {
         $modulespath = ($env:psmodulepath -split ";")[0]
+
+        if (!([string]::IsNullOrEmpty($Target)) )
+        {
+            $modulespath = $Target 
+        }
         
         $PowerShellModule = "$modulespath\$Repository"
 
